@@ -5,13 +5,13 @@ let list = document.querySelector('.list');
 
 let toDoList = [];
 
-function storage() {
-    if(toDoList===[]) {
-        console.log(localStorage);
-        let listStorage = JSON.parse(localStorage.getItem('toDo')); 
-        list.innerHTML = listStorage;
+
+    if(localStorage.getItem('toDo')) {
+        
+        toDoList = JSON.parse(localStorage.getItem('toDo')); 
+        displayMessages();
     }
-}
+
 
 btnAddTask.addEventListener('click', function () {
     let newToDo = {
