@@ -3,31 +3,69 @@ body {
     
 }
 
+
 .todo {
-    display: flex;
-    flex-direction: column;
+    
     max-width: 500px;
-    align-items: center;
+    min-height: 1000px;
     margin: 0 auto;
     background-color: rgb(25, 24, 107);
     border-radius: 10px;
 }
 
+.nameToDo {
+    padding-top: 40px;
+    display: flex;
+    justify-content: center;
+    color: aliceblue;
+}
+
 .input-task {
     border-radius: 5px;
     margin: 10px;
-    height: 20px;
+    height: 40px;
+    font-size: large;
 }
 
 .add-task {
-
-}
-
-li {
-    list-style-type: none;
-    border-bottom: 1px solid #000;
+    font-weight: bold;
 }
 
 .important {
     color: red;
+}
+
+.todo-list {
+    border-radius: 10px;
+    padding: 0 5px;
+    padding-bottom: 5px;
+}
+
+.list {
+    background-color: beige;
+    display: flex;
+    flex-direction: column;
+}
+
+.li {
+    list-style-type: none;
+    border-bottom: 1px solid #000;
+    display: flex;
+    justify-content: space-between;
+    
+}
+
+.li-active {
+    text-decoration: line-through;
+}
+
+.close {
+    background-color: red;
+    font-weight: bold;
+}
+
+.clear-list {
+    list-style: none;
+    margin: 0 auto;
+    height: 100%;
 }
