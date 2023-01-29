@@ -64,7 +64,7 @@ body {
     font-weight: bold;
 }
 
-.clear-list {
+.empty {
     list-style: none;
     margin: 0 auto;
     height: 100%;

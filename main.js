@@ -9,16 +9,19 @@ let bntClearTask = document.querySelector('.clear-tasks');
 
 let toDoList = [];
 
-// Добавление задачи
+
+renderTasks();
+
+//Добавление задачи
 
 btnAddTask.addEventListener('click', function () {
     let newToDo = {
-        
+
         todo: inputTask.value,
         checked: false,
         important: false,
     };
-    
+
     const options = {
         method: 'POST',
         headers: {
@@ -30,58 +33,63 @@ btnAddTask.addEventListener('click', function () {
 
     fetch('http://localhost/todolists/create', options)
         .then(response => response.json())
-        .then((result) => {
-            alert(result.message);
+        .then((data) => {
+            toDoList.push(data);
+            renderTask();
+
         })
         .catch(error => console.error(error));
+
+
 
 })
 
 
-// Кнопка вывода списка задач с сервера
+//  Функция отоброжения списка задач с сервера
 
 function renderTasks() {
-
+    let html = '';
+    //if (toDoList.length === 0) list.innerHTML = '' ;
     fetch('http://localhost/todolists')
-    .then(response => response.json())
-    .then(result => {
-            const html = 
-            (id, checked, important, name) => {
-                return `<li class='li'>
-                         <input class='check'  type='checkbox' id='${id}' ${checked ? 'checked' : ''}>
-                        <label for='' class="${important ? 'important' : ''}">${name}</label>
-                        <button class='close-btn' data-task-id='${id}'>Delete</button>
+        .then(response => response.json())
+        .then(result => {
+            ;
+            toDoList = result;
+            renderTask();
+        })
+
+}
+
+// Функция отображения одной задачи
+
+function renderTask() {
+    let html = '';
+    //if (toDoList.length === 0) list.innerHTML = '';
+    toDoList.forEach(function (item) {
+        html +=
+            `<li class='li'>
+                         <input class='check'  type='checkbox' id='${item.id}' ${item.checked ? 'checked' : ''}>
+                        <label for='' class="${item.important ? 'important' : ''}">${item.name}</label>
+                        <button class='close-btn' data-task-id='${item.id}'>Delete</button>
                         
-                     </li>
-                     `;
-            }
-            result.tasks.forEach(element => {
-                toDoList += html(
-                    element.id,
-                    element.checked,
-                    element.important,
-                    element.name
+                     </li>`;
 
-                )
-            });
-            list.innerHTML = toDoList;
-         
 
-    })
-    console.log(toDoList);
-}   
- 
-renderTasks();
-  
+        list.innerHTML = html;
+
+    });
+};
+
 // Кнопка удаления всех задач
+
 bntClearTask.addEventListener('click', () => {
 
     const options = {
         method: 'DELETE',
-    headers: {
-        'Content-Type': 'application/json;charset=utf-8'
-    },
-    
+        headers: {
+            'Content-Type': 'application/json;charset=utf-8'
+        },
+
     }
 
     fetch('http://localhost/todolists', options)
@@ -91,75 +99,39 @@ bntClearTask.addEventListener('click', () => {
         })
 })
 
-
-
-
 // Удаление одной задачи
+
 list.addEventListener('click', event => {
-    
-    if(event.target.classList.contains('close-btn')) {
-        
+
+    if (event.target.classList.contains('close-btn')) {
+
         const taskId = event.target.dataset.taskId;
         const options = {
             method: 'DELETE',
             headers: {
                 'Content-Type': 'application/json;charset=utf-8'
             },
-            
+
         }
 
         fetch(`http://localhost/todolists/${taskId}`, options)
             .then(response => response.json())
             .then((data) => {
-                 console.log(data);
-            
-             })
+                console.log(data);
 
-            
+            })
+
+
     }
 
-    
+
 
 })
 
-// Отмечаем выполненную задачу
-// list.addEventListener('change', event => {
-
-//     if (event.target.classList.contains('check')) {
-
-//         const checkId = event.target.getAttribute('id');
-
-//         let upToDo = {
-
-//             checked: true,
-//             important: true,
-//             id: checkId
-//         };
-
-//         const options = {
-//             method: 'PUT',
-//             headers: {
-//                 'Content-Type': 'application/json;charset=utf-8'
-//             },
-//             body: JSON.stringify(upToDo)
-//         };
-
-//         fetch(`http://localhost/todolists/${checkId}`, options)
-//             .then(response => response.json())
-//             .then((result) => {
-//                 console.log(result);
-
-
-
-
-//             })
-
-//     }
-
-// })
+// Отмечаем завершенную задачу 
 
 list.addEventListener('click', event => {
-    
+
     const checks = document.getElementsByClassName('check');
 
     for (i = 0; i <= checks.length; i++) {
@@ -215,82 +187,23 @@ list.addEventListener('click', event => {
     }
 })
 
-// Функция отображения задачи
-
-// function displayMessages() {
-//     let displayMessage = '';
-//     if(toDoList.length === 0) list.innerHTML = '';
-
-
-//         toDoList.forEach(function (item, i) {
-
-//             displayMessage += `
-//         <li class='li'>
-//             <input type='checkbox' id='item_${i}' ${item.checked ? 'checked' : ''}>
-//             <label for='item_${i}' class="${item.important ? 'important' : ''}">${item.todo}</label>
-//             <span class='close' data-delete='${item.id}'>X</span>
-//         </li>
-//         `;
-//             list.innerHTML = displayMessage;
-
-//         });
-
-//         emptyTodoList();
-
-
-// }
-
-// const html = result.tasks
-//             .map((item,i) => {
-//                 return `<li class='li'>
-//                          <input class='check'  type='checkbox' id='${item.id}' ${item.checked ? 'checked' : ''}>
-//                         <label for='item_${i}' class="${item.important ? 'important' : ''}">${item.name}</label>
-//                         <button class='close-btn' data-task-id='${item.id}'>Delete</button>
-                        
-//                      </li>
-//                      `;
-//             })
-//             .join("");
-//           toDoList.push(html);
-//         list.innerHTML = toDoList;
- 
-// Отмечаем завершенную задачу
-
-// list.addEventListener('change', function (event) {
-//     let idInput = event.target.getAttribute('id');
-//     let forLabel = document.querySelector('[for=' + idInput + ']');
-//     let valueLabel = forLabel.innerHTML;
-
-//     toDoList.forEach(function (item) {
-//         if (item.todo === valueLabel) {
-//             item.checked = !item.checked;
-//             localStorage.setItem('toDo', JSON.stringify(toDoList));
-//             forLabel.classList.toggle('li-active');
-//         }
-//     });
-
-
-//  });
-
-
-
-// // Функция выведения Empty при отсутствии задач
+ // Функция выведения Empty при отсутствии задач
 
 function emptyTodoList() {
     if (toDoList.length === 0) {
 
         const emptyTodoListHTML =
-            `<li class="clear">Empty</li>`;
+            `<li class="empty">Empty</li>`;
 
         list.insertAdjacentHTML('afterbegin', emptyTodoListHTML);
     }
 
     if (toDoList.length > 0) {
 
-        // const emptyTodoListEl = document.querySelector('.clear');
+        const emptyTodoListEl = document.querySelector('.empty');
 
-        // emptyTodoListEl ? emptyTodoListEl.remove() : null;
-        
+        emptyTodoListEl ? emptyTodoListEl.remove() : null;
+
     }
 
 }
