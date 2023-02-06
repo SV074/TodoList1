@@ -5,6 +5,8 @@ let list = document.querySelector('.list');
 let btnClose = document.querySelectorAll('.close-btn');
 let bntClearTask = document.querySelector('.clear-tasks');
 
+
+let toDoList = [];
 renderTasks();
 
 //Добавление задачи
@@ -26,45 +28,54 @@ btnAddTask.addEventListener('click', function () {
         fetch('http://localhost/todolists/create', options)
             .then(response => response.json())
             .then((data) => {
-                list.innerHTML += template(data);
-                const newTaskElement = list.querySelector(`#task-${data.id}`);
-                addListenertsToTask(newTaskElement);
+                toDoList.push(data);
+                let html = document.createElement('li');
+                html.className = 'li';
+                html.id = `task-${data.id}`;
+                html.innerHTML = templateWithoutLi(data);
+                list.append(html);
+                addListenertsToTask(html);
             })
             .catch(error => console.error(error));
-
     }
-
-
-
 })
 
 
 //  Функция отоброжения списка задач с сервера
 
 function renderTasks() {
-    let html = '';
     fetch('http://localhost/todolists')
         .then(response => response.json())
         .then(result => {
             toDoList = result;
-            toDoList.forEach(function (item) {
-                list.innerHTML += template(item);
-               
-            });
-            addEventListeners();
+            renderHtml();
+            
         })
 
 }
 
+function renderHtml() {
+    list.innerHTML = '';
+    toDoList.forEach(function (item) {
+        list.innerHTML += template(item);
+
+    });
+    addEventListeners();
+};
+
+// Функция отрисовки одной задачи(конкатенация c li)
 const template = (item) => {
     return `<li class='li' id='task-${item.id}'>${templateWithoutLi(item)}</li>`;
 }
 
+//Функция отрисовки без li
 const templateWithoutLi = (item) => {
-    return `<input class='check'  type='checkbox' id='${item.id}' ${item.checked ? 'checked' : ''}>
-    <label for='item' id='${item.id}' class="${item.important ? 'important': ' '}" >${item.name}</label>
+    return ` <div class="form-check form-switch">
+    <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckChecked" ${item.checked ? 'checked' : ''}>
+    <label class="form-check-label ${item.important ? 'important' : ' '}  ${item.checked ? 'li-active' : ''}" for="flexSwitchCheckChecked">${item.name}</label>
+    </div> 
     <div class='butons'>
-    <button class='span'><span type='button' class="material-symbols-outlined ${item.important ? 'important': ' '}"  data-important-id='${item.id}'>
+    <button class='span'><span type='button' class="material-symbols-outlined ${item.important ? 'important' : ' '}" >
     label_important
     </span>
     </button>
@@ -73,20 +84,31 @@ const templateWithoutLi = (item) => {
     </buttons>`;
 }
 
+// Функция, которая перебирает все li и к ним применяет ф-цию addListenersToTask()
 function addEventListeners() {
     const tasks = document.querySelectorAll('.li');
-    for(let i=0;i<tasks.length;i++) {        
-        addListenertsToTask(tasks[i]);        
+    for (let i = 0; i < tasks.length; i++) {
+        addListenertsToTask(tasks[i]);
     }
 }
 
+// task-{id} => id Функция удаления префикса task из task-id
+const formattedTaskId = (stringId) => {
+    return stringId.replace('task-', '');
+}
+
+function findTaskIndex(taskId) {
+    return toDoList.findIndex(element => element.id === taskId);
+};
+
+// Вешаем слушатели на каждую задачу один раз
 function addListenertsToTask(taskElement) {
-    let item = taskElement;
-    let liId = item.getAttribute('id');
-    
-    const check = item.querySelector('.check');
+    const item = taskElement;
+    const liId = item.getAttribute('id');
+    const label = item.querySelector('.form-check-label');
+    const check = item.querySelector('.form-check-input');
     check.addEventListener('change', (event) => {
-        const checkId = event.target.getAttribute('id');
+        const checkId = formattedTaskId(liId);
         if (check.checked) {
             let upToDo = {
                 checked: true,
@@ -102,13 +124,8 @@ function addListenertsToTask(taskElement) {
                 .then(response => response.json())
                 .then((result) => {
                     console.log(result);
-                     let label = document.querySelectorAll('label');
-                     for (i = 0; i < label.length; i++) {
-                         item = label[i];
-                        if (result.updateTask.name === item.innerText) {
-                            item.classList.add('li-active');
-                        }
-                    }
+                    label.classList.add('li-active');
+                    
                 })
         } else if (!check.checked) {
             let upToDo = {
@@ -125,13 +142,16 @@ function addListenertsToTask(taskElement) {
                 .then(response => response.json())
                 .then((result) => {
                     console.log(result);
+                    label.classList.remove('li-active');
+                    addListenertsToTask(item);
                 })
         }
     });
+
     const deleteBtn = item.querySelector('.close-btn');
     deleteBtn.addEventListener('click', event => {
         const taskId = formattedTaskId(liId);
-        
+
         const options = {
             method: 'DELETE',
             headers: {
@@ -142,12 +162,17 @@ function addListenertsToTask(taskElement) {
         fetch(`http://localhost/todolists/${taskId}`, options)
             .then(response => response.json())
             .then((data) => {
+                let index = findTaskIndex(data.id);
+                console.log(index);
+                toDoList.splice(index, 1);
                 item.remove();
+                console.log(toDoList);
             })
     })
+
     const editBtn = item.querySelector('.edit-btn');
     editBtn.addEventListener('click', event => {
-        
+
         const taskId = formattedTaskId(liId);
         console.log(liId);
         let editToDo = {
@@ -160,76 +185,59 @@ function addListenertsToTask(taskElement) {
             },
             body: JSON.stringify(editToDo)
         };
-        if(inputTask.value!=='') {
+        if (inputTask.value !== '') {
             fetch(`http://localhost/todolists/${taskId}/edit`, options)
-            .then(response => response.json())
-            .then((result) => {
-                item.innerHTML = templateWithoutLi(result.editTask);
-                addListenertsToTask(item);
-            })
-        }
-    });
-    
-    const importantBtn = item.querySelector('.material-symbols-outlined');
-    importantBtn.addEventListener('click', event => {
-        const importantId = formattedTaskId(liId);
-        
-        // if(importantBtn.className !== 'important') {
-            let importantToDo = {
-                important: true
-            }
-            const options = {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json;charset=utf-8'
-                },
-                body: JSON.stringify(importantToDo)
-            }
-            fetch(`http://localhost/todolists/${importantId}/important`, options)
                 .then(response => response.json())
                 .then((result) => {
-                     console.log(result);
+                    item.innerHTML = templateWithoutLi(result.editTask);
                     
-                  
-                    // if (result.updateTask.important === true) {
-                    //     item.classList.add('important');
-                    //     item.classList.add('importants');
-                    // }
-    
+                    //addEventListeners();
+                    addListenertsToTask(item);
                 })
-            //}
-    })
-    // const getUnimportantBtn = item.querySelector('.importants');
-    // console.log(getUnimportantBtn);
-    // getUnimportantBtn.addEventListener('click', event => {
-    //     const importantId = formattedTaskId(liId);
-    //     let importantToDo = {
-    //         important: false
-    //     }
-    //     const options = {
-    //         method: 'PUT',
-    //         headers: {
-    //             'Content-Type': 'application/json;charset=utf-8'
-    //         },
-    //         body: JSON.stringify(importantToDo)
-    //     }
-    //     fetch(`http://localhost/todolists/${importantId}/unimportant`, options)
-    //         .then(response => response.json())
-    //         .then((result) => {
-    //             console.log(result);
-    //             if (result.updateTask.important === false) {
-    //                 item.classList.remove('important');
-    //                 // addListenertsToTask(item);
-    //             }
+        }
+    });
 
-    //         })
-    // })
+    const importantBtn = item.querySelector('.material-symbols-outlined');
+    importantBtn.addEventListener('click', event => {
+
+        const importantId = formattedTaskId(liId);
+        let importantToDo = {
+
+            important: !importantBtn.classList.contains('important')
+        }
+        const options = {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json;charset=utf-8'
+            },
+            body: JSON.stringify(importantToDo)
+        }
+        fetch(`http://localhost/todolists/${importantId}/change-important-status`, options)
+            .then(response => response.json())
+            .then((result) => {
+                console.log(result);
+                if (result.important) {
+                    label.classList.remove('important');
+                    importantBtn.classList.remove('important');
+                } else {
+                    label.classList.add('important');
+                    importantBtn.classList.add('important');
+
+                }
+
+                let taskImportant = toDoList.findIndex(element => element.id === result.updateTask.id);
+                toDoList[taskImportant] = result.updateTask;
+                toDoList.sort((a, b) =>
+                    b.important - a.important);
+                renderHtml();
+
+            })
+        
+    });
+
 }
 
-// task-{id} => id Функция удаления префикса task из task-id
-const formattedTaskId = (stringId) => {
-    return stringId.replace('task-', '');
-}
+
 
 // Кнопка удаления всех задач
 
@@ -249,16 +257,15 @@ bntClearTask.addEventListener('click', () => {
         })
 })
 
-
-// // Функция выведения Empty при отсутствии задач
+// Функция выведения Empty при отсутствии задач
 
 function emptyTodoList() {
-    if (list.innerHTML ==='') {
+    if (list.innerHTML === '') {
         const emptyTodoListHTML =
             `<li class="empty">Empty</li>`;
         list.insertAdjacentHTML('afterbegin', emptyTodoListHTML);
     }
-    if (list.innerHTML!== '') {
+    if (list.innerHTML !== '')  {
         const emptyTodoListEl = document.querySelector('.empty');
         emptyTodoListEl ? emptyTodoListEl.remove() : null;
     }

@@ -29,7 +29,7 @@ body {
 }
 
 .material-symbols-outlined {
-
+    cursor: pointer;
 }
 
 .span {
@@ -41,18 +41,17 @@ body {
     font-weight: bold;
     border-radius: 6px;
 }
-
+.close-btn,
 .edit-btn {
-    
+    border-radius: 6px;
 }
 
 .important {
     color: red;
+    
 }
 
-.importants {
-    color: red;
-}
+
 
 .todo-list {
     border-radius: 10px;
@@ -61,9 +60,11 @@ body {
 }
 
 .list {
+    margin: 40px 10px ;
     background-color: beige;
     display: flex;
     flex-direction: column;
+    border-radius: 10px;
 }
 
 .li {
@@ -74,6 +75,9 @@ body {
     
 }
 
+.form-check {
+    padding-left: 50px;
+}
 .li-active {
     text-decoration: line-through;
 }
