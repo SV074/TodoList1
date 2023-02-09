@@ -1,17 +1,21 @@
 let inputTask = document.querySelector('.field-task');
-let btnAddTask = document.querySelector('.add-task');
+let btnAddTask = document.querySelector('.enter');
 const check = document.querySelector('.check');
 let list = document.querySelector('.list');
 let btnClose = document.querySelectorAll('.close-btn');
 let bntClearTask = document.querySelector('.clear-tasks');
-
+let myModal = document.getElementById('.exampleModal');
 
 let toDoList = [];
 renderTasks();
 
-//Добавление задачи
+// myModal.addEventListener('hide.bs.modal', () => {
+//     inputTask.value = '';
+// })
 
+//Добавление задачи
 btnAddTask.addEventListener('click', function () {
+    
     let newToDo = {
         todo: inputTask.value,
         checked: false,
@@ -35,6 +39,7 @@ btnAddTask.addEventListener('click', function () {
                 html.innerHTML = templateWithoutLi(data);
                 list.append(html);
                 addListenertsToTask(html);
+                inputTask.value = '';
             })
             .catch(error => console.error(error));
     }
@@ -42,20 +47,20 @@ btnAddTask.addEventListener('click', function () {
 
 
 //  Функция отоброжения списка задач с сервера
-
 function renderTasks() {
     fetch('http://localhost/todolists')
         .then(response => response.json())
         .then(result => {
             toDoList = result;
             renderHtml();
-            
+
         })
 
 }
 
 function renderHtml() {
     list.innerHTML = '';
+    
     toDoList.forEach(function (item) {
         list.innerHTML += template(item);
 
@@ -72,16 +77,26 @@ const template = (item) => {
 const templateWithoutLi = (item) => {
     return ` <div class="form-check form-switch">
     <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckChecked" ${item.checked ? 'checked' : ''}>
-    <label class="form-check-label ${item.important ? 'important' : ' '}  ${item.checked ? 'li-active' : ''}" for="flexSwitchCheckChecked">${item.name}</label>
+    <label class="form-check-label label ${item.important ? 'important' : ' '}  ${item.checked ? 'li-active' : ''}"  >${item.name}</label>
     </div> 
-    <div class='butons'>
-    <button class='span'><span type='button' class="material-symbols-outlined ${item.important ? 'important' : ' '}" >
-    label_important
-    </span>
+    <div class='buttons'>
+    <button class="panel">
+    <span class="material-symbols-outlined import-btn ${item.important ? 'important' : ' '}" >
+         priority_high
+         </span>
     </button>
-    <button class='edit-btn'>Edit</button>
-    <button class='close-btn'>Delete</button>
-    </buttons>`;
+        </span>
+         <button class="panel">
+         <span class="material-symbols-outlined  edit-btn">
+            edit
+        </span>
+         </button>
+        <button class="panel">
+        <span class="material-symbols-outlined close-btn">
+            delete
+        </span>
+        </button>
+       </buttons>`;
 }
 
 // Функция, которая перебирает все li и к ним применяет ф-цию addListenersToTask()
@@ -105,10 +120,11 @@ function findTaskIndex(taskId) {
 function addListenertsToTask(taskElement) {
     const item = taskElement;
     const liId = item.getAttribute('id');
-    const label = item.querySelector('.form-check-label');
+    const label = item.querySelector('.label');
     const check = item.querySelector('.form-check-input');
     check.addEventListener('change', (event) => {
         const checkId = formattedTaskId(liId);
+        
         if (check.checked) {
             let upToDo = {
                 checked: true,
@@ -125,7 +141,7 @@ function addListenertsToTask(taskElement) {
                 .then((result) => {
                     console.log(result);
                     label.classList.add('li-active');
-                    
+
                 })
         } else if (!check.checked) {
             let upToDo = {
@@ -190,8 +206,6 @@ function addListenertsToTask(taskElement) {
                 .then(response => response.json())
                 .then((result) => {
                     item.innerHTML = templateWithoutLi(result.editTask);
-                    
-                    //addEventListeners();
                     addListenertsToTask(item);
                 })
         }
@@ -227,12 +241,12 @@ function addListenertsToTask(taskElement) {
 
                 let taskImportant = toDoList.findIndex(element => element.id === result.updateTask.id);
                 toDoList[taskImportant] = result.updateTask;
-                toDoList.sort((a, b) =>
-                    b.important - a.important);
-                renderHtml();
+                toDoList.sort((a, b) => b.important - a.important);
+                console.log(toDoList);
+                renderTasks();
 
             })
-        
+
     });
 
 }
@@ -240,7 +254,6 @@ function addListenertsToTask(taskElement) {
 
 
 // Кнопка удаления всех задач
-
 bntClearTask.addEventListener('click', () => {
     const options = {
         method: 'DELETE',
@@ -258,14 +271,13 @@ bntClearTask.addEventListener('click', () => {
 })
 
 // Функция выведения Empty при отсутствии задач
-
 function emptyTodoList() {
     if (list.innerHTML === '') {
         const emptyTodoListHTML =
             `<li class="empty">Empty</li>`;
         list.insertAdjacentHTML('afterbegin', emptyTodoListHTML);
     }
-    if (list.innerHTML !== '')  {
+    if (list.innerHTML !== '') {
         const emptyTodoListEl = document.querySelector('.empty');
         emptyTodoListEl ? emptyTodoListEl.remove() : null;
     }
