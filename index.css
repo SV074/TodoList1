@@ -6,22 +6,28 @@ body {
     font-family: Arial, Helvetica, sans-serif;
     height: 100%;
     width: 100%;
+    margin: auto 0;
 }
 
 .todos {
     display: grid;
-    width: 100%;
-    grid-template-columns: 1fr 1fr 1fr;
+    width: 70%;
+    grid-template-columns: 1fr 1fr;
     height: 100%;
-}
+    border: 1px solid grey;
+}   
 
 .stripe {
     height: 50px;
     
 }
 
+.todo {
+    background-color:rgb(245, 245, 245);
+}
+
 .todo-done { 
-    
+    width: 100%;
     background-color: rgb(199, 197, 197);
 }
 
@@ -66,7 +72,7 @@ body {
 
 .todo-list {
     
-    height: 500px;
+    /* height: 500px; */
     display: flex;
 }
 
@@ -102,6 +108,7 @@ body {
     border: none;
     color:rgb(102, 233, 178);
     height: 70px;
+    
 }
 
 .circle {
@@ -109,51 +116,52 @@ body {
 }
 
 .circle-check {
-    height: 250px;
-    width: 250px;
+    height: 200px;
+    width: 200px;
     color:grey;
 } 
 
+.list-important,
 .list {
-    width: 100%;
-    background-color: beige;
-    /* display: flex;
-    flex-direction: column; */
-    margin-top: 10px;
+    width: 100%; 
+   
+   
+    
 }
 
 .li {
-    /* list-style-type: none; */
+    
     border: 1px solid rgb(196, 196, 196) ;
     border-radius: 10px;
-    /* margin-top: 10px; */
     display: flex;
     justify-content: space-between;
     align-items: center;
     background-color: white;
-    box-shadow: 5px 5px gray;
+    box-shadow: 2px 2px gray;
     margin-right: 10px;
     position: relative;
     height: max-content;
     margin-top: 10px;
+    
 }
 
 .buttons {
-    display: flex;
-    align-items: flex-start;
-    visibility: hidden;
-    position: absolute;
-    right: 0;
-    width: 30px;
-    height: 90px; 
+    display: none;
+    border-radius: 6px;
+    
 }
 
 .li:hover .buttons{
-    visibility: visible;
+    position: absolute;
+    display: block;
+    right: -30px;
+    width: 30px;
+    height: 90px;
 }
 .panel {
     border: none;
     border-radius: 6px;
+    color: blue;
 }
 
 .li-active {
@@ -165,8 +173,23 @@ body {
     font-weight: bold;
 }
 
-/* .empty {
-    list-style: none;
-    margin: 0 auto;
-    height: 100%;
-} */
+.label {
+    font-weight: 500;
+}
+
+.text {
+    font-weight: 400;
+    color:grey;
+}
+
+.info-task {
+    color: grey;
+}
+
+.notasks {
+    font-weight: bold;
+}
+ 
+.hidden {
+    display: none;
+}
