@@ -7,108 +7,138 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
     <link rel="stylesheet" href="index.css">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet"
-        integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous">
     <link rel="stylesheet"
         href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0" />
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-kenU1KFdBIe4zVF0s0G1M5b4hcpxyD9F7jL+jjXkk+Q2h455rYXK/7HAuoJl+0I4" crossorigin="anonymous"></script>
 </head>
 
 <body>
-    <div class="todos mx-auto">
-
-        <div class="todo">
+    <div class="todos mx-auto row gy-2 text-center">
+        <div class="todo col-6 p-0">
             <div class="stripe">
-                <div class="header-1 first d-flex align-items-center">
-                    <span class="material-symbols-outlined icon">
-                        vital_signs
-                    </span>
-                    <h5 class="nameToDo">To-Do</h5>
-                    <span class="counter"></span>
+                <div class="header-1 first d-flex align-items-center justify-content-between">
+                    <div class="part d-flex">
+                        <span class="material-symbols-outlined icon clear-tasks">
+                            vital_signs
+                        </span>
+                        <h5 class="nameToDo mb-1">To-Do</h5>
+                    </div>
+
+                    <div class="number-task pe-1">
+                        <span class="counter pe-2">0</span>
+                    </div>
                 </div>
+
             </div>
             <div class="todo-list">
-                <ol class="list">
+                <ol class="list p-2 pt-3">
                     <!-- <li class="empty">Empty</li> -->
                 </ol>
                 <!-- Modal -->
-                <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel"
+                <div class="modal fade" id="editTaskModal" tabindex="-1" aria-labelledby="editTaskModalLabel"
                     aria-hidden="true">
                     <div class="modal-dialog">
                         <div class="modal-content">
                             <div class="modal-header">
-                                <h1 class="modal-title fs-5" id="exampleModalLabel">Task</h1>
+                                <h1 class="modal-title fs-5" id="editTaskModalLabel">Задача</h1>
                                 <button type="button" class="btn-close" data-bs-dismiss="modal"
                                     aria-label="Close"></button>
                             </div>
-                            <div class="modal-body grid">
-                                <input type="text" class="field-task1 form-control m-2 col" placeholder="Name task" aria-label="Recipient's username"
-                                    aria-describedby="basic-addon2">
-                                <input type="text" class="field-task2 form-control m-2 col" placeholder="Task" aria-label="Recipient's username"
-                                    aria-describedby="basic-addon2">
+                            <div class="modal-body">
+                                <input type="text" class="field-task1 form-control  mb-4" id="edit-task-field-name" placeholder="Название задачи"
+                                    aria-label="Recipient's username" aria-describedby="basic-addon2">
+                                <input type="text" class="field-task2 form-control" id="edit-task-field-info" placeholder="Информация о задаче"
+                                    aria-label="Recipient's username" aria-describedby="basic-addon2">
+                                <form action="">
+                                    <div class="form-group">
+                                        <label class="" for="inputDate">Введите дату:</label>
+                                        <input type="date" class="form-control field-date" id="edit-task-field-date">
+                                    </div>
+                                </form>
                             </div>
                             <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                                <button type="button" class="btn btn-primary enter">Save changes</button>
+                                <!-- <button type="button" class="btn btn-primary edit">Редактировать</button> -->
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
+                                <button type="button" id="button-task-edit" class="btn btn-primary enter">Сохранить изменения</button>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-            <button type="button" class="btn btn-primary clear-tasks bg-dark text-white col-lg-3">Clear
-                Tasks</button>
+            <!-- <button type="button" class="btn btn-primary clear-tasks bg-dark text-white col-lg-3 mx-auto">Clear
+                Tasks</button>  -->
         </div>
-        <div class="todo-done">
+        <div class="todo-done col-6 p-0">
             <div class="stripe">
                 <div class="header-2 second d-flex align-items-center">
                     <span class="material-symbols-outlined icon" height="50" width="50">
                         check_circle
                     </span>
-                    <h5 class="nameToDo">Done</h5>
+                    <h5 class="nameToDo mb-1">Done</h5>
                 </div>
             </div>
+            <!-- data-bs-toggle="modal" data-bs-target="#editTaskModal" -->
             <div class="info">
-                <span class="material-symbols-outlined plus text-success" data-bs-toggle="modal"
-                    data-bs-target="#exampleModal" height="100" width="100" viewBox="0 0 40 40">
-                    add_circle
-                </span>
-                
-                <div class="info-task d-flex flex-column align-items-center" id="info">
-                    <span class="circle ">
-                        <svg class="circle-check text-yelow" xmlns="http://www.w3.org/2000/svg" height="50%" width="50%"
-                            viewBox="0 0 50 50">
-                            <symbol id="par">
-                                <path fill="currentColor"
-                                    d="m17.583 27.625 11.792-11.792-2.083-2.041-9.709 9.75-4.916-4.917-2.042 2ZM20 36.667q-3.417 0-6.458-1.313-3.042-1.312-5.313-3.583t-3.583-5.313Q3.333 23.417 3.333 20q0-3.458 1.313-6.5 1.312-3.042 3.583-5.292t5.313-3.562Q16.583 3.333 20 3.333q3.458 0 6.5 1.313 3.042 1.312 5.292 3.562t3.562 5.292q1.313 3.042 1.313 6.5 0 3.417-1.313 6.458-1.312 3.042-3.562 5.313T26.5 35.354q-3.042 1.313-6.5 1.313Zm0-2.792q5.792 0 9.833-4.042 4.042-4.041 4.042-9.833t-4.042-9.833Q25.792 6.125 20 6.125t-9.833 4.042Q6.125 14.208 6.125 20t4.042 9.833q4.041 4.042 9.833 4.042ZM20 20Z" />
-                            </symbol>
-                            <use xlink:href="#par" />
-                        </svg>
-                    </span>
-                    <div class="notasks">No tasks</div>
-                    <div class="method addtask">Drag tasks here or click + to add new tasks</div>
+                <div class="plus" id="plus" >
+                    <?xml version="1.0" ?><svg height="30" width="30" enable-background="new 0 0 512 512" id="Layer_1"
+                        version="1.1" viewBox="0 0 512 512" xml:space="preserve" xmlns="http://www.w3.org/2000/svg"
+                        xmlns:xlink="http://www.w3.org/1999/xlink">
+                        <g>
+                            <g>
+                                <linearGradient gradientUnits="userSpaceOnUse" id="SVGID_1_" x1="0.0000038" x2="512"
+                                    y1="256" y2="256">
+                                    <stop offset="0" style="stop-color:#fffefe" />
+                                    <stop offset="1" style="stop-color:#ffffff" />
+                                </linearGradient>
+                                <circle cx="256" cy="256" fill="#ffffff" r="256" />
+                                <linearGradient gradientUnits="userSpaceOnUse" id="SVGID_2_" x1="42.6666679"
+                                    x2="469.3333435" y1="256.0005188" y2="256.0005188">
+                                    <stop offset="0" style="stop-color:#ffffff" />
+                                    <stop offset="1" style="stop-color:#ffffff" />
+                                </linearGradient>
+                                <path
+                                    d="M256,469.3338623c-117.6309357,0-213.3333282-95.7023926-213.3333282-213.3333435    c0-117.6314545,95.7023926-213.333313,213.3333282-213.333313c117.636261,0,213.3333435,95.7018661,213.3333435,213.333313    C469.3333435,373.6314697,373.636261,469.3338623,256,469.3338623z"
+                                    fill="url(#SVGID_2_)" />
+                            </g>
+                            <polygon id="XMLID_109_" opacity="0.3"
+                                points="384,242.5413361 285.459198,242.5413361 285.459198,144 242.5424042,144    242.5424042,242.5413361 144,242.5413361 144,285.4581299 242.5424042,285.4581299 242.5424042,384 285.459198,384    285.459198,285.4581299 384,285.4581299  " />
+                            <polygon fill="#68b8e5" id="XMLID_189_"
+                                points="376,234.5413361 277.459198,234.5413361 277.459198,136 234.5424042,136    234.5424042,234.5413361 136,234.5413361 136,277.4581299 234.5424042,277.4581299 234.5424042,376 277.459198,376    277.459198,277.4581299 376,277.4581299  " />
+                        </g>
+                    </svg>
                 </div>
+                <div class="information">
+                    <div class="info-task d-flex flex-column align-items-center" id="info">
+                        <span class="circle ps-5">
+                            <svg class="circle-check text-yelow" xmlns="http://www.w3.org/2000/svg" height="50%" width="50%"
+                                viewBox="0 0 50 50">
+                                <symbol id="par">
+                                    <path fill="currentColor"
+                                        d="m17.583 27.625 11.792-11.792-2.083-2.041-9.709 9.75-4.916-4.917-2.042 2ZM20 36.667q-3.417 0-6.458-1.313-3.042-1.312-5.313-3.583t-3.583-5.313Q3.333 23.417 3.333 20q0-3.458 1.313-6.5 1.312-3.042 3.583-5.292t5.313-3.562Q16.583 3.333 20 3.333q3.458 0 6.5 1.313 3.042 1.312 5.292 3.562t3.562 5.292q1.313 3.042 1.313 6.5 0 3.417-1.313 6.458-1.312 3.042-3.562 5.313T26.5 35.354q-3.042 1.313-6.5 1.313Zm0-2.792q5.792 0 9.833-4.042 4.042-4.041 4.042-9.833t-4.042-9.833Q25.792 6.125 20 6.125t-9.833 4.042Q6.125 14.208 6.125 20t4.042 9.833q4.041 4.042 9.833 4.042ZM20 20Z" />
+                                </symbol>
+                                <use xlink:href="#par" />
+                            </svg>
+                        </span>
+                        <div class="notasks">No Tasks</div>
+                        <div class="method addtask">
+                            Drag tasks here </br> or click + to add new tasks
+                        </div>
+                    </div>
+                </div>
+                
                 <div class="important-tasks">
-                    <ol class="list-important">
-
+                    <ol class="list_important p-2">
+                        
                     </ol>
                 </div>
-                
+
             </div>
         </div>
-        <!-- <div class="todo-someday col">
-            <div class="stripe">
-                <div class="header-3 third d-flex align-items-center">
-                    <span class="material-symbols-outlined icon">
-                        tips_and_updates
-                    </span>
-                    <h5 class="nameToDo">To-Do Someday</h5>
-                </div>
-            </div>
-
-        </div> -->
+        
         <script src="main.js"></script>
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"
-            integrity="sha384-w76AqPfDkMBDXo30jS1Sgez6pr3x5MlQ1ZAGC+nuZB+EYdgRZgiwxhTBTkF7CXvN"
-            crossorigin="anonymous"></script>
+        
 </body>
 
 </html>
+
