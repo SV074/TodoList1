@@ -5,8 +5,6 @@ html {
 body {
     font-family: Arial, Helvetica, sans-serif;
     height: 100%;
-    
-    
 }
 
 .todos {
@@ -62,10 +60,12 @@ body {
     padding-left: 20px;
 }
 
-.field-task {
-    height: 40px;
-    min-width:200px;
-    font-size: large;
+
+.field-task2 {
+    width: 465px;
+    height: 35px;
+    border-radius: 5px;
+    border-color: rgb(184, 184, 184);
 }
 
 .todo-list {
@@ -128,9 +128,8 @@ body {
     display: flex;
     flex-direction: column;
     position: relative;
-    /* align-items: flex-end; */
     background-color: white;
-    box-shadow: 1px 1px rgb(155, 155, 155);
+    box-shadow: 4px 4px 15px 0px rgb(231 229 229);
     height: max-content;
     margin-bottom: 15px;
     
@@ -173,13 +172,7 @@ body {
     vertical-align: -4px;
 }
 
-.form-check-input {
-    
-    
-}  
-
- 
- /* .task-value {
+ .task-value {
     font-weight: 400;
     color:grey;
     display: none;
@@ -200,8 +193,16 @@ body {
 .li:hover .task-value {
     display: block;
     transition: 5s;
-}   */
+}  
 
 .hidden {
     display: none;
+}
+
+.visible {
+    visibility: hidden;
+}
+
+#button-ask-delete-yes {
+    width: 40px;
 }

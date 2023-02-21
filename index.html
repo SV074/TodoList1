@@ -7,10 +7,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
     <link rel="stylesheet" href="index.css">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous">
     <link rel="stylesheet"
         href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0" />
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-kenU1KFdBIe4zVF0s0G1M5b4hcpxyD9F7jL+jjXkk+Q2h455rYXK/7HAuoJl+0I4" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-kenU1KFdBIe4zVF0s0G1M5b4hcpxyD9F7jL+jjXkk+Q2h455rYXK/7HAuoJl+0I4"
+        crossorigin="anonymous"></script>
 </head>
 
 <body>
@@ -22,11 +25,11 @@
                         <span class="material-symbols-outlined icon clear-tasks">
                             vital_signs
                         </span>
-                        <h5 class="nameToDo mb-1">To-Do</h5>
+                        <h5 class="nameToDo mb-1">Список задач</h5>
                     </div>
 
                     <div class="number-task pe-1">
-                        <span class="counter pe-2">0</span>
+                        <span class="counter pe-2"></span>
                     </div>
                 </div>
 
@@ -45,11 +48,14 @@
                                 <button type="button" class="btn-close" data-bs-dismiss="modal"
                                     aria-label="Close"></button>
                             </div>
-                            <div class="modal-body">
-                                <input type="text" class="field-task1 form-control  mb-4" id="edit-task-field-name" placeholder="Название задачи"
-                                    aria-label="Recipient's username" aria-describedby="basic-addon2">
-                                <input type="text" class="field-task2 form-control" id="edit-task-field-info" placeholder="Информация о задаче"
-                                    aria-label="Recipient's username" aria-describedby="basic-addon2">
+                            <div class="modal-body" id="modal-body">
+                                <input type="text" class="field-task1 form-control  mb-4" id="edit-task-field-name"
+                                    placeholder="Название задачи" aria-label="Recipient's username"
+                                    aria-describedby="basic-addon2">
+                                
+                                <textarea class="field-task2" name="" placeholder="Информация о задаче"
+                                    id="edit-task-field-info" aria-label="Recipient's username"
+                                    aria-describedby="basic-addon2" cols="30" rows="10" max></textarea>
                                 <form action="">
                                     <div class="form-group">
                                         <label class="" for="inputDate">Введите дату:</label>
@@ -59,8 +65,8 @@
                             </div>
                             <div class="modal-footer">
                                 <!-- <button type="button" class="btn btn-primary edit">Редактировать</button> -->
-                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
-                                <button type="button" id="button-task-edit" class="btn btn-primary enter">Сохранить изменения</button>
+                                <button type="button" id="button-task-edit" class="btn btn-primary enter"></button>
+                                <button type="button" id="button-task-close"  class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
                             </div>
                         </div>
                     </div>
@@ -75,12 +81,12 @@
                     <span class="material-symbols-outlined icon" height="50" width="50">
                         check_circle
                     </span>
-                    <h5 class="nameToDo mb-1">Done</h5>
+                    <h5 class="nameToDo mb-1">Завершенные задачи</h5>
                 </div>
             </div>
             <!-- data-bs-toggle="modal" data-bs-target="#editTaskModal" -->
             <div class="info">
-                <div class="plus" id="plus" >
+                <div class="plus" id="plus">
                     <?xml version="1.0" ?><svg height="30" width="30" enable-background="new 0 0 512 512" id="Layer_1"
                         version="1.1" viewBox="0 0 512 512" xml:space="preserve" xmlns="http://www.w3.org/2000/svg"
                         xmlns:xlink="http://www.w3.org/1999/xlink">
@@ -111,8 +117,8 @@
                 <div class="information">
                     <div class="info-task d-flex flex-column align-items-center" id="info">
                         <span class="circle ps-5">
-                            <svg class="circle-check text-yelow" xmlns="http://www.w3.org/2000/svg" height="50%" width="50%"
-                                viewBox="0 0 50 50">
+                            <svg class="circle-check text-yelow" xmlns="http://www.w3.org/2000/svg" height="50%"
+                                width="50%" viewBox="0 0 50 50">
                                 <symbol id="par">
                                     <path fill="currentColor"
                                         d="m17.583 27.625 11.792-11.792-2.083-2.041-9.709 9.75-4.916-4.917-2.042 2ZM20 36.667q-3.417 0-6.458-1.313-3.042-1.312-5.313-3.583t-3.583-5.313Q3.333 23.417 3.333 20q0-3.458 1.313-6.5 1.312-3.042 3.583-5.292t5.313-3.562Q16.583 3.333 20 3.333q3.458 0 6.5 1.313 3.042 1.312 5.292 3.562t3.562 5.292q1.313 3.042 1.313 6.5 0 3.417-1.313 6.458-1.312 3.042-3.562 5.313T26.5 35.354q-3.042 1.313-6.5 1.313Zm0-2.792q5.792 0 9.833-4.042 4.042-4.041 4.042-9.833t-4.042-9.833Q25.792 6.125 20 6.125t-9.833 4.042Q6.125 14.208 6.125 20t4.042 9.833q4.041 4.042 9.833 4.042ZM20 20Z" />
@@ -120,25 +126,42 @@
                                 <use xlink:href="#par" />
                             </svg>
                         </span>
-                        <div class="notasks">No Tasks</div>
+                        <div class="notasks">Нет задач</div>
                         <div class="method addtask">
-                            Drag tasks here </br> or click + to add new tasks
+                            Перетащите задачи сюда </br> или нажмите плюс, чтобы создать задачу
                         </div>
                     </div>
                 </div>
-                
+
                 <div class="important-tasks">
                     <ol class="list_important p-2">
-                        
+
                     </ol>
                 </div>
-
+                <!-- toasts -->
+                <div class="toast align-items-center  p-3" id="toast-task" role="alert" aria-live="assertive"
+                    aria-atomic="true" data-bs-autohide="false">
+                    <div class="d-flex align-items-center justify-content-between">
+                        <div class="toast-body">
+                            <div class="fs-6" id="toast-text">Задача создана!</div>
+                        </div>
+                        <div class="button-toast ms-3" id="buttons-ask-delete">
+                            <button type="button" class="btn btn-primary btn-sm align-items-center m-2"
+                                id="button-ask-delete-yes">Да </button>
+                            <button type="button" class="btn btn-primary btn-sm" id="button-ask-delete-no"
+                                data-bs-dismiss="toast">Нет</button>
+                        </div>
+                        <div class="" id="button-toast-close">
+                            <button type="button" class="btn-close " data-bs-dismiss="toast"
+                                aria-label="Close"></button>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
-        
+
         <script src="main.js"></script>
-        
+
 </body>
 
 </html>
-
