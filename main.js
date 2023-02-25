@@ -4,6 +4,7 @@ let inputDate = document.getElementById('edit-task-field-date');
 const check = document.querySelector('.check');
 const list = document.querySelector('.list');
 const completedList = document.querySelector('.list_important');
+const activeList = document.querySelector('.list_active');
 const bntClearTask = document.querySelector('.clear-tasks');
 let editTaskBtn = document.querySelector('.enter');
 const saveEdit = document.getElementById('button-task-edit');
@@ -26,19 +27,22 @@ const btnCloseModal = document.getElementById('button-task-close');
 
 let toDoList = [];
 let toDoListDone = [];
+let toDoListActive = [];
 
 renderTasks();
 renderTasksDone();
+renderTasksActive();
 
 //Кол-во задач
 function countClick() {
-    if(toDoList.length >= 0) {
+    if(toDoList.length > 0) {
         counter.innerHTML = toDoList.length;
+    } else {
+        counter.innerHTML = '';
     }
-    
 };
 
-// Когда модальное окно закрыто стирается содержимое инпутов 
+// Когда модальное окно закрыто стирается содержимое инпутов и ...
 editTaskModalElement.addEventListener('hidden.bs.modal', (event) => {
     nameTask.value = '';
     infoTask.value = '';
@@ -69,10 +73,10 @@ plus.addEventListener('click', event => {
         let newToDo = {
             todo: nameTask.value,
             info: infoTask.value,
-            dateTaskAdd: new Date().toLocaleDateString(),
-            checked: false,
+            dateTaskAdd: replaceDateTimeFormat(new Date()),
+            completed: false,
             important: false,
-            reminderTask: inputDate.value,
+            reminderTask: replaceReminderDateTime(inputDate.value),
         };
 
         const options = {
@@ -107,41 +111,30 @@ plus.addEventListener('click', event => {
 })
 
 // Функция которая меняет формат даты
-const replaceDate = (date) => {
-    return date.split('-').reverse().join('.');
+function replaceDateTimeFormat(d) {
+    return ( d.getFullYear() + "-" + ("0"+(d.getMonth()+1)).slice(-2) + "-" + ("0" + d.getDate()).slice(-2))
+    + " " + ("0" + d.getHours()).slice(-2) + ":" + ("0" + d.getMinutes()).slice(-2);
+}
+   
+const replaceReminderDateTime = (date) => {
+    return date.replace('T', ' ');
 }
 
-// Функция изменения формата даты с dd.mm.yyyy на yyyy-mm-dd
-const reverseReplaceFormatDate = (date) => {
-    return date.split('.').reverse().join('-');
-}
-
-// function reminderTasks() {
-//     fetch('http://localhost/todolists/reminder')
+//         fetch('http://localhost/todolists/reminder')
 //     .then(response => response.json())
 //         .then(result => {
-//             result.forEach(function(item) {
-//                 let dateS = replaceDate(item.reminder);
-//                 item.reminder = dateS;
-//                 console.log(dateS);
-//                 if(item.date === item.reminder) {
-
-//                 }
-
-//             })
-
+//             alert(result);
+//             renderHtmlDone();
 //         })
 // }
-
-
 
 //  Функция отображения списка задач
 function renderTasks() {
     fetch('http://localhost/todolists')
         .then(response => response.json())
         .then(result => {
-            let uncheckedTasks = result.filter(element => element.checked === false);
-            toDoList = uncheckedTasks;
+            let uncompletedTasks = result.filter(element => element.completed === false);
+            toDoList = uncompletedTasks;
             renderHtml();
             //reminderTasks();
             countClick();
@@ -153,13 +146,22 @@ function renderTasksDone() {
     fetch('http://localhost/todolists/done')
         .then(response => response.json())
         .then(result => {
-
-            let checkedTasks = result.filter(element => element.checked === true);
-
-            toDoListDone = checkedTasks;
+            let completedTasks = result.filter(element => element.completed === true);
+            toDoListDone = completedTasks;
             renderHtmlDone();
-            //reminderTasks();
+            // reminderTasks();
 
+        })
+}
+
+function renderTasksActive() {
+    fetch('http://localhost/todolists/active')
+        .then(response => response.json())
+        .then(result => {
+            console.log(result);
+            toDoListActive = result;
+            // reminderTasks();
+            renderHtmlActive();
         })
 }
 
@@ -187,6 +189,16 @@ function renderHtmlDone() {
     emptyTodoList();
 };
 
+function renderHtmlActive() {
+    activeList.innerHTML = '';
+
+    toDoListActive.forEach(function (item) {
+        activeList.innerHTML += template(item);
+    });
+    addEventListeners();
+    emptyTodoList();
+};
+
 // Функция отрисовки одной задачи(конкатенация c li)
 const template = (item) => {
     return `<li class='form-floating li' id='task-${item.id}'>${templateWithoutLi(item)}</li>`;
@@ -195,15 +207,14 @@ const template = (item) => {
 //Функция отрисовки без li
 const templateWithoutLi = (item) => {
     return `<div class="name-info text-start p-3">
-    <h5 class="name-task text-start ${item.important ? 'important' : ' '} ${item.checked ? 'li-active' : ''}">${item.name}</h5>
-    <div class="task-value text-start ${item.checked ? 'li-active' : ''} ">${item.info}</div>
+    <h5 class="name-task text-start ${item.important ? 'important' : ' '} ${item.completed ? 'li-active' : ''}">${item.name}</h5>
+    <div class="task-value text-start ${item.completed ? 'li-active' : ''} ">${item.info}</div>
 </div>
 <div class="buttons">
     <div class="form-check mb-2 d-flex justify-content-between">
         <label for="flexCheckChecked"
             class="form-check-label label ms-3">
-            <input class="form-check-input check" type="checkbox" role="switch" id="flexSwitchCheckChecked" ${item.checked
-            ? 'checked' : ''}>
+            <input class="form-check-input check" type="checkbox" role="switch" id="flexSwitchCheckChecked" ${item.completed ? 'checked' : ''}>
         </label>
         <div class="spans d-flex">
         <div class="import-btn ${item.important ? 'important' : ' '}">
@@ -244,9 +255,10 @@ function addListenertsToTask(taskElement) {
     const check = item.querySelector('.form-check-input');
 
     check.addEventListener('change', (event) => {
+        event.stopPropagation();
         const checkId = formattedTaskId(liId);
         let upToDo = {
-            checked: check.checked
+            completed: check.checked
         };
         const options = {
             method: 'PUT',
@@ -255,14 +267,11 @@ function addListenertsToTask(taskElement) {
             },
             body: JSON.stringify(upToDo)
         };
-        fetch(`http://localhost/todolists/${checkId}/check-status`, options)
+        fetch(`http://localhost/todolists/${checkId}/completed-status`, options)
             .then(response => response.json())
             .then((result) => {
-
-
-                if (result.checked) {
+                if (result.completed) {
                     label.classList.remove('li-active');
-
                 } else {
                     label.classList.add('li-active');
                 }
@@ -300,7 +309,7 @@ function addListenertsToTask(taskElement) {
                     toastTask.show();
                     closeEditModal();
                     let index = findTaskIndex(data.id);
-                     toDoList.splice(index, 1);
+                    toDoList.splice(index, 1);
                     item.remove();
                     renderTasks();
                     countClick();
@@ -324,8 +333,8 @@ function addListenertsToTask(taskElement) {
         let dataTask = JSON.parse(editBtn.getAttribute('data-task'));
         nameTask.value = dataTask.name;
         infoTask.value = dataTask.info;
-        inputDate.value = reverseReplaceFormatDate(dataTask.date);
-
+        inputDate.value = dataTask.date;
+        
         let listener = (event) => {
 
             event.stopPropagation();

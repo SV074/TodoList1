@@ -17,8 +17,8 @@
 </head>
 
 <body>
-    <div class="todos mx-auto row gy-2 text-center">
-        <div class="todo col-6 p-0">
+    <div class="todos mx-auto row gy-2 ">
+        <div class="todo col p-0">
             <div class="stripe">
                 <div class="header-1 first d-flex align-items-center justify-content-between">
                     <div class="part d-flex">
@@ -27,7 +27,6 @@
                         </span>
                         <h5 class="nameToDo mb-1">Список задач</h5>
                     </div>
-
                     <div class="number-task pe-1">
                         <span class="counter pe-2"></span>
                     </div>
@@ -36,7 +35,7 @@
             </div>
             <div class="todo-list">
                 <ol class="list p-2 pt-3">
-                    <!-- <li class="empty">Empty</li> -->
+                  
                 </ol>
                 <!-- Modal -->
                 <div class="modal fade" id="editTaskModal" tabindex="-1" aria-labelledby="editTaskModalLabel"
@@ -57,14 +56,13 @@
                                     id="edit-task-field-info" aria-label="Recipient's username"
                                     aria-describedby="basic-addon2" cols="30" rows="10" max></textarea>
                                 <form action="">
-                                    <div class="form-group">
+                                    <div class="form-group" >
                                         <label class="" for="inputDate">Введите дату:</label>
-                                        <input type="date" class="form-control field-date" id="edit-task-field-date">
+                                        <input type="datetime-local" class="form-control field-date" id="edit-task-field-date">
                                     </div>
                                 </form>
                             </div>
                             <div class="modal-footer">
-                                <!-- <button type="button" class="btn btn-primary edit">Редактировать</button> -->
                                 <button type="button" id="button-task-edit" class="btn btn-primary enter"></button>
                                 <button type="button" id="button-task-close"  class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
                             </div>
@@ -75,7 +73,22 @@
             <!-- <button type="button" class="btn btn-primary clear-tasks bg-dark text-white col-lg-3 mx-auto">Clear
                 Tasks</button>  -->
         </div>
-        <div class="todo-done col-6 p-0">
+        <div class="todo-active col p-0">
+            <div class="stripe">
+                <div class="header-3 third d-flex align-items-center">
+                    <span class="material-symbols-outlined icon">
+                        emoji_objects
+                    </span>
+                    <h5 class="nameToDo mb-1">Текущие задачи</h5>
+                </div>
+            </div>
+            <div class="todo-list-active">
+                <ol class="list_active">
+
+                </ol>
+            </div>
+        </div>
+        <div class="todo-done col p-0">
             <div class="stripe">
                 <div class="header-2 second d-flex align-items-center">
                     <span class="material-symbols-outlined icon" height="50" width="50">
@@ -159,7 +172,6 @@
                 </div>
             </div>
         </div>
-
         <script src="main.js"></script>
 
 </body>

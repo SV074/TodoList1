@@ -8,9 +8,8 @@ body {
 }
 
 .todos {
-    width: 800px;
+    width: 1200px;
     height: 100%;
-    
 }   
 
 .stripe {
@@ -24,11 +23,10 @@ body {
 }
 
 .todo-done { 
-    
     background-color: rgb(230, 229, 229);
 }
 
-.todo-someday {
+.todo-active {
     background-color: rgb(226, 223, 223);
 }
 
@@ -42,10 +40,10 @@ body {
 }
 
 .second {
-    background-color:rgb(153, 76, 226);
+    background-color:rgb(153, 153, 153);
 }
 .third {
-    background-color:rgb(153, 153, 153)
+    background-color: rgb(153, 76, 226);
 }
 
 .header-1,
@@ -92,7 +90,6 @@ body {
     
 }
 .info {
-    
     height: 100%;
     display: flex;
     flex-direction: column;
