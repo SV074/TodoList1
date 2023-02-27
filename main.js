@@ -3,8 +3,8 @@ let infoTask = document.getElementById('edit-task-field-info');;
 let inputDate = document.getElementById('edit-task-field-date');
 const check = document.querySelector('.check');
 const list = document.querySelector('.list');
-const completedList = document.querySelector('.list_important');
-const activeList = document.querySelector('.list_active');
+const completedList = document.querySelector('.list-completed');
+const activeList = document.querySelector('.list-active');
 const bntClearTask = document.querySelector('.clear-tasks');
 let editTaskBtn = document.querySelector('.enter');
 const saveEdit = document.getElementById('button-task-edit');
@@ -32,6 +32,7 @@ let toDoListActive = [];
 renderTasks();
 renderTasksDone();
 renderTasksActive();
+// dragLi();
 
 //Кол-во задач
 function countClick() {
@@ -86,20 +87,24 @@ plus.addEventListener('click', event => {
             },
             body: JSON.stringify(newToDo)
         };
-        if ('' !== nameTask.value && infoTask.value !== '') {
+        if ('' !== nameTask.value && infoTask.value !== '' && inputDate.value) {
             fetch('http://localhost/todolists/create', options)
                 .then(response => response.json())
                 .then((data) => {
                     toastText.innerHTML = 'Задача создана !';
                     toastTask.show();
                     closeEditModal();
-                    toDoList.push(data);
-                    let html = document.createElement('li');
-                    html.className = 'li';
-                    html.id = `task-${data.id}`;
-                    html.innerHTML = templateWithoutLi(data);
-                    list.append(html);
-                    addListenertsToTask(html);
+                    addTask(data, toDoList, list);
+
+
+                    // toDoList.push(data);
+                    // let html = document.createElement('li');
+                    // html.className = 'li';
+                    // html.id = `task-${data.id}`;
+                    // html.innerHTML = templateWithoutLi(data);
+                    // list.append(html);
+
+                    //addListenertsToTask(html);
                     countClick();
                     saveEdit.removeEventListener('click', listener);
                 })
@@ -120,23 +125,27 @@ const replaceReminderDateTime = (date) => {
     return date.replace('T', ' ');
 }
 
-//         fetch('http://localhost/todolists/reminder')
-//     .then(response => response.json())
+// function renderTasks(filterCallback, array, element) {
+//     fetch('http://localhost/todolists')
+//         .then(response => response.json())
 //         .then(result => {
-//             alert(result);
-//             renderHtmlDone();
+//                 let tasks = result.filter(filterCallback);
+//                 array = tasks;
+//             renderHtml(element, array);
+
+//             countClick();
 //         })
 // }
 
-//  Функция отображения списка задач
+// Функция отображения списка задач
 function renderTasks() {
     fetch('http://localhost/todolists')
         .then(response => response.json())
         .then(result => {
-            let uncompletedTasks = result.filter(element => element.completed === false);
-            toDoList = uncompletedTasks;
-            renderHtml();
-            //reminderTasks();
+                let uncompletedTasks = result.filter(item => (item.completed === false && (item.reminder > item.date)));
+                toDoList = uncompletedTasks;
+            renderHtml(list, toDoList);
+            
             countClick();
         })
 }
@@ -146,10 +155,10 @@ function renderTasksDone() {
     fetch('http://localhost/todolists/done')
         .then(response => response.json())
         .then(result => {
-            let completedTasks = result.filter(element => element.completed === true);
-            toDoListDone = completedTasks;
-            renderHtmlDone();
-            // reminderTasks();
+            let doneTasks = result.filter((element) => { return element.completed === true});
+            toDoListDone = doneTasks;
+            renderHtml(completedList, toDoListDone);
+            
 
         })
 }
@@ -158,46 +167,25 @@ function renderTasksActive() {
     fetch('http://localhost/todolists/active')
         .then(response => response.json())
         .then(result => {
-            console.log(result);
-            toDoListActive = result;
+            
+            let activeTask = result.filter(element => (element.date >= element.reminder));
+            toDoListActive = activeTask;
+
             // reminderTasks();
-            renderHtmlActive();
+            renderHtml(activeList, toDoListActive);
         })
 }
 
-//Функция проходиться по каждому item в результате каждой операции 
-function renderHtml() {
-    list.innerHTML = '';
-
-    toDoList.forEach(function (item) {
-        list.innerHTML += template(item);
-
-    });
-    addEventListeners();
-    emptyTodoList();
-};
-
-//Функция 
-function renderHtmlDone() {
-    completedList.innerHTML = '';
-
-    toDoListDone.forEach(function (item) {
-        completedList.innerHTML += template(item);
+function renderHtml(element, array) {
+    element.innerHTML = '';
+    
+    array.forEach(function (item) {
+        element.innerHTML += template(item);
 
     });
     addEventListeners();
     emptyTodoList();
-};
-
-function renderHtmlActive() {
-    activeList.innerHTML = '';
-
-    toDoListActive.forEach(function (item) {
-        activeList.innerHTML += template(item);
-    });
-    addEventListeners();
-    emptyTodoList();
-};
+}
 
 // Функция отрисовки одной задачи(конкатенация c li)
 const template = (item) => {
@@ -220,7 +208,7 @@ const templateWithoutLi = (item) => {
         <div class="import-btn ${item.important ? 'important' : ' '}">
         <svg   xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 21 21"><path fill="none " stroke="#888888" stroke-linecap="round" stroke-linejoin="round" d="M10.5 6.5c.5-2.5 4.343-2.657 6-1c1.603 1.603 1.5 4.334 0 6l-6 6l-6-6a4.243 4.243 0 0 1 0-6c1.55-1.55 5.5-1.5 6 1z"/></svg>
         </div>
-            <div class="edit-btn ms-1" data-task='{"name": "${item.name}", "info": "${item.info}", "date": "${item.date}"}'>
+            <div class="edit-btn ms-1" data-task='{"name": "${item.name}", "info": "${item.info}", "date": "${item.reminder}"}'>
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 21 21"><g fill="none" fill-rule="evenodd" stroke="#888888" stroke-linecap="round" stroke-linejoin="round"><path d="M10 4.5H5.5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V11"/><path d="M17.5 3.467a1.462 1.462 0 0 1-.017 2.05L10.5 12.5l-3 1l1-3l6.987-7.046a1.409 1.409 0 0 1 1.885-.104zm-2 2.033l.953 1"/></g></svg>
         </div>
         <div class="close-btn ms-1 me-2"> 
@@ -229,6 +217,40 @@ const templateWithoutLi = (item) => {
         </div>
 </div>`;
 }
+
+//Функция переноса задачи
+// function dragLi() {
+//     let dropField = document.querySelector('.list-active');
+//     let dragTask = document.getElementById((`task-${item.id}`));
+
+//     dropField.ondragover = allowDrop;
+
+//     function allowDrop(event) {
+//         event.preventDefault();
+//     }
+
+    
+//     dragTask.ondragstart = drag;
+    
+    
+
+//     function drag(event) {
+//         event.dataTransfer.setData('id', event.target.id);
+//         console.log(event.target.id);
+//     }
+
+    
+//     dropField.ondrop = drop;
+
+//     function drop(event) {
+        
+//         let taskId = event.dataTransfer.getData('id');
+//         console.log(taskId);
+//         event.target.append(document.getElementById(taskId));
+//     }
+
+// }
+
 
 // Функция, которая перебирает все li и к ним применяет ф-цию addListenersToTask()
 function addEventListeners() {
@@ -243,9 +265,26 @@ const formattedTaskId = (stringId) => {
     return stringId.replace('task-', '');
 }
 
-function findTaskIndex(taskId) {
-    return toDoList.findIndex(element => element.id === taskId);
+function findTaskIndex(taskId, array) {
+    return array.findIndex(element => element.id === taskId);
 };
+
+function removeTask(id, array, element) {
+    let index = findTaskIndex(id, array);
+    let removedTasks = array.splice(index, 1);
+    element.remove();
+    return removedTasks.shift();
+}
+
+function addTask(task, array, element) {
+    array.push(task);
+    let html = document.createElement('li');
+    html.className = 'li';
+    html.id = `task-${task.id}`;
+    html.innerHTML = templateWithoutLi(task);
+    element.append(html);
+    addListenertsToTask(html);
+}
 
 // Вешаем слушатели на каждую задачу один раз
 function addListenertsToTask(taskElement) {
@@ -272,11 +311,14 @@ function addListenertsToTask(taskElement) {
             .then((result) => {
                 if (result.completed) {
                     label.classList.remove('li-active');
+                    let removedTask = removeTask(liId, toDoList, item);
+                    addTask(removedTask, toDoListDone, completedList);
                 } else {
                     label.classList.add('li-active');
+                    
                 }
-                renderTasks();
-                renderTasksDone();
+                //renderTasks();
+                //renderTasksDone();
                 emptyTodoList();
                 countClick();
             })
@@ -284,7 +326,7 @@ function addListenertsToTask(taskElement) {
 
     const deleteBtn = item.querySelector('.close-btn');
     deleteBtn.addEventListener('click', event => {
-        event.stopPropagation();
+        event.stopImmediatePropagation();
         const taskId = formattedTaskId(liId);
         editTaskBtn.innerHTML = "Да";
         btnCloseModal.innerHTML = "Нет";
@@ -292,9 +334,9 @@ function addListenertsToTask(taskElement) {
         modalTitle.innerHTML = 'Вы уверены, что хотите удалить задачу?';
         editTaskModal.toggle();
         btnsAskDelete.classList.add('hidden');
+
         let listener = (event) => {
 
-            event.stopPropagation();
             const options = {
                 method: 'DELETE',
                 headers: {
@@ -308,10 +350,7 @@ function addListenertsToTask(taskElement) {
                     toastText.innerHTML = 'Задача удалена.';
                     toastTask.show();
                     closeEditModal();
-                    let index = findTaskIndex(data.id);
-                    toDoList.splice(index, 1);
-                    item.remove();
-                    renderTasks();
+                    removeTask(data.id, toDoList, item);
                     countClick();
                     saveEdit.removeEventListener('click', listener);
                 })
@@ -341,6 +380,7 @@ function addListenertsToTask(taskElement) {
             let editToDo = {
                 name: nameTask.value,
                 info: infoTask.value,
+                reminder:replaceReminderDateTime(inputDate.value),
             };
             const options = {
                 method: 'PUT',
@@ -353,20 +393,20 @@ function addListenertsToTask(taskElement) {
             fetch(`http://localhost/todolists/${taskId}/edit`, options)
                 .then(response => response.json())
                 .then((result) => {
+                    console.log(result);
                     toastText.innerHTML = 'Задача отредактирована!';
                     toastTask.show();
                     closeEditModal();
                     item.innerHTML = templateWithoutLi(result.editTask);
+                    // editBtn.setAttribute
                     addListenertsToTask(item);
                     renderTasks();
                     renderTasksDone();
+                    renderTasksActive();
                     saveEdit.removeEventListener('click', listener);
-
                 })
-
         }
         saveEdit.addEventListener('click', listener, false);
-
     });
 
     const importantBtn = item.querySelector('.import-btn');
@@ -374,7 +414,6 @@ function addListenertsToTask(taskElement) {
         event.stopPropagation();
         const importantId = formattedTaskId(liId);
         let importantToDo = {
-
             important: !importantBtn.classList.contains('important')
         }
         const options = {
@@ -404,6 +443,37 @@ function addListenertsToTask(taskElement) {
             })
     });
 
+    // let dropField = document.querySelector('.list-active');
+    // let dragTask = item.getElementById('.li');
+
+    // dropField.ondragover = allowDrop;
+
+    // function allowDrop(event) {
+    //     event.preventDefault();
+    // }
+
+    // // console.log(dragTask);
+    
+    // //for(i=0;i<dragTask.length;i++) {
+        
+    //     dragTask.ondragstart = drag;
+    // //}
+    
+
+    // function drag(event) {
+    //     event.dataTransfer.setData('id', event.target.id);
+    //     console.log(event.target.id);
+    // }
+
+    
+    // dropField.ondrop = drop;
+
+    // function drop(event) {
+        
+    //     let taskId = event.dataTransfer.getData('id');
+    //     console.log(taskId);
+    //     event.target.append(document.getElementById(taskId));
+    // }
 }
 
 // Кнопка удаления всех задач
@@ -422,9 +492,11 @@ bntClearTask.addEventListener('click', (event) => {
 
             list.innerHTML = '';
             completedList.innerHTML = '';
+            activeList.innerHTML = '';
             counter.innerHTML = '';
             toDoList = [];
             toDoListDone = [];
+            toDoListActive = [];
         })
     emptyTodoList();
 })

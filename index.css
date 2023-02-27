@@ -61,7 +61,7 @@ body {
 
 .field-task2 {
     width: 465px;
-    height: 35px;
+    height: 50px;
     border-radius: 5px;
     border-color: rgb(184, 184, 184);
 }
@@ -115,9 +115,11 @@ body {
     color:grey;
 } 
 
+.list-active,
 .list_important,
 .list {
     width: 400px; 
+    height: 800px;
 }
 
 .li {
@@ -169,7 +171,7 @@ body {
     vertical-align: -4px;
 }
 
- .task-value {
+ /* .task-value {
     font-weight: 400;
     color:grey;
     display: none;
@@ -190,7 +192,7 @@ body {
 .li:hover .task-value {
     display: block;
     transition: 5s;
-}  
+}   */
 
 .hidden {
     display: none;
@@ -203,3 +205,8 @@ body {
 #button-ask-delete-yes {
     width: 40px;
 }
+
+.active-status-task {
+    box-shadow: 4px 4px 15px 0px rgb(104, 90, 156);
+}
+
