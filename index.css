@@ -85,10 +85,6 @@ body {
     border-radius: 6px;
 }
 
-.important {
-    color: red;
-    
-}
 .info {
     height: 100%;
     display: flex;
@@ -116,7 +112,7 @@ body {
 } 
 
 .list-active,
-.list_important,
+.list-completed,
 .list {
     width: 400px; 
     height: 800px;
@@ -132,6 +128,15 @@ body {
     height: max-content;
     margin-bottom: 15px;
     
+}
+
+.important {
+    color: red;
+    
+}
+
+.important-li {
+    box-shadow: 4px 4px 15px 0px rgb(173, 19, 19);
 }
 
 .name-info {
@@ -171,7 +176,7 @@ body {
     vertical-align: -4px;
 }
 
- /* .task-value {
+ .task-value {
     font-weight: 400;
     color:grey;
     display: none;
@@ -192,7 +197,7 @@ body {
 .li:hover .task-value {
     display: block;
     transition: 5s;
-}   */
+}  
 
 .hidden {
     display: none;

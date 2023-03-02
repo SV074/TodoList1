@@ -75,11 +75,16 @@
         </div>
         <div class="todo-active col p-0">
             <div class="stripe">
-                <div class="header-3 third d-flex align-items-center">
-                    <span class="material-symbols-outlined icon">
-                        emoji_objects
-                    </span>
-                    <h5 class="nameToDo mb-1">Текущие задачи</h5>
+                <div class="header-3 third d-flex align-items-center justify-content-between">
+                    <div class="part d-flex">
+                        <span class="material-symbols-outlined icon">
+                            emoji_objects
+                        </span>
+                        <h5 class="nameToDo mb-1">Текущие задачи</h5>
+                    </div>
+                        <div class="number-task pe-1">
+                            <span class="counter-active-task pe-2"></span>
+                        </div>
                 </div>
             </div>
             <div class="todo-list-active">
@@ -90,11 +95,16 @@
         </div>
         <div class="todo-done col p-0">
             <div class="stripe">
-                <div class="header-2 second d-flex align-items-center">
-                    <span class="material-symbols-outlined icon" height="50" width="50">
-                        check_circle
-                    </span>
-                    <h5 class="nameToDo mb-1">Завершенные задачи</h5>
+                <div class="header-2 second d-flex align-items-center justify-content-between">
+                    <div class="part d-flex" >
+                        <span class="material-symbols-outlined icon" height="50" width="50">
+                            check_circle
+                        </span>
+                        <h5 class="nameToDo mb-1">Завершенные задачи</h5>
+                    </div>
+                    <div class="number-task pe-1">
+                        <span class="counter-completed-task pe-2"></span>
+                    </div>
                 </div>
             </div>
             <!-- data-bs-toggle="modal" data-bs-target="#editTaskModal" -->
