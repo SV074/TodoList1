@@ -51,7 +51,7 @@ function closeEditModal() {
 
 //Добавление задачи
 plus.addEventListener('click', event => {
-    event.stopPropagation();
+    event.stopImmediatePropagation();
     modalTitle.innerHTML = 'Задача';
     editTaskModal.toggle();
     editTaskBtn.innerHTML = "Создать задачу";
@@ -63,10 +63,10 @@ plus.addEventListener('click', event => {
         let newToDo = {
             todo: nameTask.value,
             info: infoTask.value,
-            dateTaskAdd: replaceDateTimeFormat(new Date()),
+            dateTaskAdd: new Date(),
             completed: false,
             important: false,
-            reminderTask: (inputDate.value),
+            actualDate: inputDate.value,
         };
 
         const options = {
@@ -80,11 +80,19 @@ plus.addEventListener('click', event => {
             fetch('http://localhost/todolists/create', options)
                 .then(response => response.json())
                 .then((data) => {
-                    toastText.innerHTML = 'Задача создана !';
+                    
                     toastTask.show();
+                    toastText.innerHTML = 'Задача создана !';
                     closeEditModal();
-                    addTask(data, toDoList, list);
-                    countClick(toDoList, counter);
+
+                    let currentDate = new Date();
+                    let actualDate = new Date(data.actual_date);
+                    
+                    if(actualDate <= currentDate) {
+                        addTask(data, toDoListActive, activeList);
+                    } else {
+                        addTask(data, toDoList, list);
+                    }
                     saveEdit.removeEventListener('click', listener);
                 })
                 .catch(error => console.error(error));
@@ -103,22 +111,14 @@ function countClick(array, element) {
     }
 };
 
-function getHoursMinutesDate(d) {
-    return ("0" + d.getHours()).slice(-2);
-}
-
-// Функция которая меняет формат даты
-function replaceDateTimeFormat(d) {
-    return (d.getFullYear() + "-" + ("0" + (d.getMonth() + 1)).slice(-2) + "-" + ("0" + d.getDate()).slice(-2))
-        + "-" + ("0" + d.getHours()).slice(-2) + ":" + ("0" + d.getMinutes()).slice(-2);
-}
-
-const replaceReminderDateTime = (date) => {
-    return date.replace('T', '-');
-}
-
-const replaceReminderDateTimeForInput = (date) => {
-    return date.replace('T', ' ');
+// Функции которые меняют формат даты
+function replaceDateTimeFormat(date) {
+    let dateInput = new Date(date);
+    const year = dateInput.getFullYear();
+    const month = ("0" + (dateInput.getMonth() + 1)).slice(-2);
+    const day = ("0" + dateInput.getDate()).slice(-2);
+    
+    return `${year}-${month}-${day}`;
 }
 
 // Функция отображения списка задач
@@ -126,19 +126,17 @@ function renderTasks() {
     fetch('http://localhost/todolists')
         .then(response => response.json())
         .then(result => {
-
-            toDoList = result.filter(item => (item.completed === false && (replaceReminderDateTime(item.reminder) > item.date)));
+            toDoList = result.filter(item => ((item.completed) === false && (Date.parse(item.actual_date)) > Date.parse(new Date())));
             toDoListDone = result.filter((element) => { return element.completed === true });
-            toDoListActive = result.filter(element => (element.date >= replaceReminderDateTime(element.reminder)));
-
+            toDoListActive = result.filter(element => (element.completed) === false && (Date.parse(new Date()) >= Date.parse(element.actual_date)));
+            
             renderHtml(list, toDoList, counter);
             renderHtml(completedList, toDoListDone, counterCompletedTask);
             renderHtml(activeList, toDoListActive, counterActiveTask);
+
             addEventListeners();
             emptyTodoList();
-            countClick(toDoList, counter);
-            countClick(toDoListActive, counterActiveTask);
-            countClick(toDoListDone, counterCompletedTask);
+            
         })
 }
 
@@ -172,7 +170,7 @@ const templateWithoutLi = (item) => {
         <div class="import-btn">
         <svg   xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 21 21"><path fill="none " stroke="#888888" stroke-linecap="round" stroke-linejoin="round" d="M10.5 6.5c.5-2.5 4.343-2.657 6-1c1.603 1.603 1.5 4.334 0 6l-6 6l-6-6a4.243 4.243 0 0 1 0-6c1.55-1.55 5.5-1.5 6 1z"/></svg>
         </div>
-            <div class="edit-btn ms-1" data-task='{"name": "${item.name}", "info": "${item.info}", "date": "${item.reminder}"}'>
+            <div class="edit-btn ms-1" data-task='{"name": "${item.name}", "info": "${item.info}", "date": "${item.actual_date}"}'>
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 21 21"><g fill="none" fill-rule="evenodd" stroke="#888888" stroke-linecap="round" stroke-linejoin="round"><path d="M10 4.5H5.5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V11"/><path d="M17.5 3.467a1.462 1.462 0 0 1-.017 2.05L10.5 12.5l-3 1l1-3l6.987-7.046a1.409 1.409 0 0 1 1.885-.104zm-2 2.033l.953 1"/></g></svg>
         </div>
         <div class="close-btn ms-1 me-2"> 
@@ -216,15 +214,36 @@ function addTask(task, array, element) {
     addListenertsToTask(html);
 }
 
+function deleteAndAdd(task, array1, array2) {
+    let id = task.id;
+    let index = findTaskIndex(id, array1);
+    array1.splice(index, 1);
+    let element = document.getElementById(`task-${id}`);
+    element.remove();
+    array2.push(task);
+    let html = document.createElement('li');
+    html.className = 'li';
+    html.id = `task-${task.id}`;
+    html.innerHTML = templateWithoutLi(task);
+    ?
+    addListenertsToTask(html);
+}
+
+function removeAndAddTask(id, array1, item, data, array2, element) {
+    removeTask(id, array1, item);
+    addTask(data, array2, element);
+};
+
 // Вешаем слушатели на каждую задачу один раз
 function addListenertsToTask(taskElement) {
+
     const item = taskElement;
     const liId = item.getAttribute('id');
     const label = item.querySelector('.label');
     const check = item.querySelector('.form-check-input');
 
     check.addEventListener('change', (event) => {
-        //event.stopImmediatePropagation();
+        
         event.stopPropagation();
         const checkId = formattedTaskId(liId);
         let upToDo = {
@@ -240,18 +259,27 @@ function addListenertsToTask(taskElement) {
         fetch(`http://localhost/todolists/${checkId}/completed-status`, options)
             .then(response => response.json())
             .then((result) => {
-
+                let currentDate = new Date();
+                let actualDate = new Date(result.actual_date);
                 if (result.completed) {
                     label.classList.remove('li-active');
-                    removeTask(liId, toDoList, item);
-                    addTask(result, toDoListDone, completedList);
-
+                    if(currentDate < actualDate) {
+                        deleteAndAdd(result, toDoList, toDoListDone, item);
+                        // removeAndAddTask(liId, toDoList, item, result, toDoListDone, completedList);
+                    } else {
+                        removeAndAddTask(liId, toDoListActive, item, result, toDoListDone, completedList);
+                    }
                 } else {
                     label.classList.add('li-active');
-                    removeTask(liId, toDoListDone, item);
-                    addTask(result, toDoList, list);
-
+                    if(currentDate >= actualDate) {
+                        
+                        removeAndAddTask(liId, toDoListDone, item, result, toDoListActive, activeList);
+                    } else {
+                        removeAndAddTask(liId, toDoListDone, item, result, toDoList, list);
+                    }
+                   
                 }
+
                 emptyTodoList();
             })
     });
@@ -283,7 +311,7 @@ function addListenertsToTask(taskElement) {
                     toastTask.show();
                     closeEditModal();
                     removeTask(data.id, toDoList, item);
-                    //countClick();
+                    
                     saveEdit.removeEventListener('click', listener);
                 })
         }
@@ -293,24 +321,25 @@ function addListenertsToTask(taskElement) {
 
     const editBtn = item.querySelector('.edit-btn');
     editBtn.addEventListener('click', event => {
-        event.stopPropagation();
+        event.stopImmediatePropagation();
         modalTitle.innerHTML = 'Редактирование задачи';
         editTaskModal.toggle();
         editTaskBtn.innerHTML = "Редактировать";
         btnsAskDelete.classList.add('hidden');
+
         const taskId = formattedTaskId(liId);
         let dataTask = JSON.parse(editBtn.getAttribute('data-task'));
         nameTask.value = dataTask.name;
         infoTask.value = dataTask.info;
-        inputDate.value = replaceReminderDateTimeForInput(dataTask.date);
-
+        inputDate.value = replaceDateTimeFormat(dataTask.date);
+        
         let listener = (event) => {
 
-            event.stopPropagation();
+            event.stopImmediatePropagation();
             let editToDo = {
                 name: nameTask.value,
                 info: infoTask.value,
-                reminder: replaceReminderDateTime(inputDate.value),
+                actual_date: new Date(inputDate.value),
             };
             const options = {
                 method: 'PUT',
@@ -326,6 +355,7 @@ function addListenertsToTask(taskElement) {
                     toastText.innerHTML = 'Задача отредактирована!';
                     toastTask.show();
                     closeEditModal();
+
                     item.innerHTML = templateWithoutLi(result);
                     addListenertsToTask(item);
                     saveEdit.removeEventListener('click', listener);
@@ -336,10 +366,9 @@ function addListenertsToTask(taskElement) {
 
     const importantBtn = item.querySelector('.import-btn');
     importantBtn.addEventListener('click', event => {
-        event.stopPropagation();
 
+        event.stopPropagation();
         const nameTaskText = item.querySelector('.name-task');
-        const liTask = item.querySelector('.form-floating');
         const importantId = formattedTaskId(liId);
 
         let importantToDo = {
@@ -367,7 +396,7 @@ function addListenertsToTask(taskElement) {
     });
 }
 
-// Кнопка удаления всех задач
+//Кнопка удаления всех задач
 bntClearTask.addEventListener('click', (event) => {
     event.stopPropagation();
     const options = {
@@ -392,7 +421,7 @@ bntClearTask.addEventListener('click', (event) => {
     emptyTodoList();
 })
 
-// 
+
 function emptyTodoList() {
     if (toDoListDone.length > 0) {
         const info = document.querySelector('.information');
