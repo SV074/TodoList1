@@ -2,9 +2,7 @@ let nameTask = document.getElementById('edit-task-field-name');
 let infoTask = document.getElementById('edit-task-field-info');;
 let inputDate = document.getElementById('edit-task-field-date');
 const check = document.querySelector('.check');
-const list = document.querySelector('.list');
-const completedList = document.querySelector('.list-completed');
-const activeList = document.querySelector('.list-active');
+
 const bntClearTask = document.querySelector('.clear-tasks');
 let editTaskBtn = document.querySelector('.enter');
 const saveEdit = document.getElementById('button-task-edit');
@@ -28,9 +26,22 @@ const modalBody = document.getElementById('modal-body');
 const modalTitle = document.querySelector('.modal-title');
 const btnCloseModal = document.getElementById('button-task-close');
 
-let toDoList = [];
-let toDoListDone = [];
-let toDoListActive = [];
+const dataTasks  = {
+    all: [],
+    active: [],
+    completed: [],
+};
+
+const list = document.querySelector('.list');
+const completedList = document.querySelector('.list-completed');
+const activeList = document.querySelector('.list-active');
+
+const listElements = {
+    all: list,
+    completed: completedList,
+    active: activeList,
+};
+
 
 renderTasks();
 
@@ -89,9 +100,9 @@ plus.addEventListener('click', event => {
                     let actualDate = new Date(data.actual_date);
                     
                     if(actualDate <= currentDate) {
-                        addTask(data, toDoListActive, activeList);
+                        addTask(data, dataTasks.active, activeList);
                     } else {
-                        addTask(data, toDoList, list);
+                        addTask(data, dataTasks.all, list);
                     }
                     saveEdit.removeEventListener('click', listener);
                 })
@@ -126,13 +137,13 @@ function renderTasks() {
     fetch('http://localhost/todolists')
         .then(response => response.json())
         .then(result => {
-            toDoList = result.filter(item => ((item.completed) === false && (Date.parse(item.actual_date)) > Date.parse(new Date())));
-            toDoListDone = result.filter((element) => { return element.completed === true });
-            toDoListActive = result.filter(element => (element.completed) === false && (Date.parse(new Date()) >= Date.parse(element.actual_date)));
+            dataTasks.all = result.filter(item => ((item.completed) === false && (Date.parse(item.actual_date)) > Date.parse(new Date())));
+            dataTasks.completed = result.filter((element) => { return element.completed === true });
+            dataTasks.active = result.filter(element => (element.completed) === false && (Date.parse(new Date()) >= Date.parse(element.actual_date)));
             
-            renderHtml(list, toDoList, counter);
-            renderHtml(completedList, toDoListDone, counterCompletedTask);
-            renderHtml(activeList, toDoListActive, counterActiveTask);
+            renderHtml(list, dataTasks.all, counter);
+            renderHtml(completedList, dataTasks.completed, counterCompletedTask);
+            renderHtml(activeList, dataTasks.active, counterActiveTask);
 
             addEventListeners();
             emptyTodoList();
@@ -157,11 +168,11 @@ const template = (item) => {
 //Функция отрисовки без li
 const templateWithoutLi = (item) => {
     return `<div class="name-info text-start p-3">
-    <h5 class="name-task text-start ${item.important ? 'important' : ' '} ${item.completed ? 'li-active' : ''}">${item.name}</h5>
-    <div class="task-value text-start ${item.completed ? 'li-active' : ''} ">${item.info}</div>
-</div>
-<div class="buttons">
-    <div class="form-check mb-2 d-flex justify-content-between">
+                <h5 class="name-task text-start ${item.important ? 'important' : ' '} ${item.completed ? 'li-active' : ''}">${item.name}</h5>
+                <div class="task-value text-start ${item.completed ? 'li-active' : ''} ">${item.info}</div>
+            </div>
+            <div class="buttons">
+            <div class="form-check mb-2 d-flex justify-content-between">
         <label for="flexCheckChecked"
             class="form-check-label label ms-3">
             <input class="form-check-input check" type="checkbox" role="switch" id="flexSwitchCheckChecked" ${item.completed ? 'checked' : ''}>
@@ -194,7 +205,7 @@ const formattedTaskId = (stringId) => {
 }
 
 function findTaskIndex(taskId, array) {
-    return array.findIndex(element => element.id === taskId);
+   return array.findIndex(element => element.id === taskId);
 };
 
 function removeTask(id, array, element) {
@@ -214,25 +225,15 @@ function addTask(task, array, element) {
     addListenertsToTask(html);
 }
 
-function deleteAndAdd(task, array1, array2) {
-    let id = task.id;
-    let index = findTaskIndex(id, array1);
-    array1.splice(index, 1);
-    let element = document.getElementById(`task-${id}`);
-    element.remove();
-    array2.push(task);
-    let html = document.createElement('li');
-    html.className = 'li';
-    html.id = `task-${task.id}`;
-    html.innerHTML = templateWithoutLi(task);
-    ?
-    addListenertsToTask(html);
+function moveTask(task, from, to) {
+    const arrayFrom = dataTasks[from];
+    const elementFrom = listElements[from];
+    const arrayTo = dataTasks[to];
+    const elementTo = listElements[to];
+    let element = document.getElementById(`task-${task.id}`);
+    removeTask(task.id, arrayFrom, element);
+    addTask(task, arrayTo, elementTo); 
 }
-
-function removeAndAddTask(id, array1, item, data, array2, element) {
-    removeTask(id, array1, item);
-    addTask(data, array2, element);
-};
 
 // Вешаем слушатели на каждую задачу один раз
 function addListenertsToTask(taskElement) {
@@ -259,27 +260,26 @@ function addListenertsToTask(taskElement) {
         fetch(`http://localhost/todolists/${checkId}/completed-status`, options)
             .then(response => response.json())
             .then((result) => {
+                
                 let currentDate = new Date();
                 let actualDate = new Date(result.actual_date);
                 if (result.completed) {
                     label.classList.remove('li-active');
-                    if(currentDate < actualDate) {
-                        deleteAndAdd(result, toDoList, toDoListDone, item);
-                        // removeAndAddTask(liId, toDoList, item, result, toDoListDone, completedList);
+                    if (currentDate < actualDate) {
+                        moveTask(result, "all", "completed");
                     } else {
-                        removeAndAddTask(liId, toDoListActive, item, result, toDoListDone, completedList);
+                        moveTask(result, "active", "completed");
                     }
                 } else {
                     label.classList.add('li-active');
-                    if(currentDate >= actualDate) {
-                        
-                        removeAndAddTask(liId, toDoListDone, item, result, toDoListActive, activeList);
+                    if (currentDate >= actualDate) {
+                        moveTask(result, "completed", "active")
                     } else {
-                        removeAndAddTask(liId, toDoListDone, item, result, toDoList, list);
-                    }
-                   
-                }
+                        moveTask(result, "completed", "all");
 
+                    }
+
+                }
                 emptyTodoList();
             })
     });
@@ -310,7 +310,7 @@ function addListenertsToTask(taskElement) {
                     toastText.innerHTML = 'Задача удалена.';
                     toastTask.show();
                     closeEditModal();
-                    removeTask(data.id, toDoList, item);
+                    removeTask(data.id, dataTasks.all, item);
                     
                     saveEdit.removeEventListener('click', listener);
                 })
@@ -355,7 +355,6 @@ function addListenertsToTask(taskElement) {
                     toastText.innerHTML = 'Задача отредактирована!';
                     toastTask.show();
                     closeEditModal();
-
                     item.innerHTML = templateWithoutLi(result);
                     addListenertsToTask(item);
                     saveEdit.removeEventListener('click', listener);
@@ -414,20 +413,40 @@ bntClearTask.addEventListener('click', (event) => {
             completedList.innerHTML = '';
             activeList.innerHTML = '';
             counter.innerHTML = '';
-            toDoList = [];
-            toDoListDone = [];
-            toDoListActive = [];
+            dataTasks.all = [];
+            dataTasks.completed = [];
+            dataTasks.active = [];
         })
     emptyTodoList();
 })
 
 
 function emptyTodoList() {
-    if (toDoListDone.length > 0) {
+    if (dataTasks.completed.length > 0) {
         const info = document.querySelector('.information');
         info.classList.add('hidden');
-    } else if (toDoListDone === 0) {
+    } else if (dataTasks.completed === 0) {
         info.classList.remove('hidden');
     }
 }
+
+// const setInt = setInterval(() => {
+//     const dateNew = new Date();
+//     let activeTask = dataTasks.all.filter((item) => {
+        
+//         return Date.parse(item.actual_date) === dateNew;
+        
+//     });
+//     console.log(chlen);
+    
+   
+    
+// }, 3000)
+
+// setTimeout(setInt, 3000);
+
+
+
+
+
 
